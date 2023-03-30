@@ -4,12 +4,12 @@ import type {cadastroRequisicao} from '../../../types/cadastroRequisicao';
 import {usuarioModel} from '../../../models/usuarioModel';
 import md5 from 'md5';
 import {conectarMongoDB} from '../../../middlewares/conectarMongoDB';
-import {uploadImage, uploadMulter} from '../../../services/uploadImagemCosmic';
+import {updload,uploadImagemCosmic} from '../../../services/uploadImagemCosmic';
 import nc from 'next-connect';
 
 
 const handler = nc()
-    .use(uploadMulter.single('file'))
+    .use(updload.single('file'))
 
     .post (async (req : NextApiRequest, res : NextApiResponse <respostaPadraoMsg>) =>{
         try{
@@ -36,7 +36,7 @@ const handler = nc()
         }
 
         // enviar a imagem do multer para o cosmic
-        const image = await uploadImage(req);
+        const image = await uploadImagemCosmic(req);
     
         // salvar no banco de dados
     
