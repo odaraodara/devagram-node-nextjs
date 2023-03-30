@@ -13,26 +13,28 @@ const bucketAvatar = cosmic.bucket({
 });
 
 const storage = multer.memoryStorage();
-const upload = multer ({ storage : storage});
+const uploadMulter = multer({ storage : storage});
 
 const uploadImage = async (req : any) => {
-    if (req && req.file.originalname) {
-        if (!req.file.originalname.includes('.png') &&
-            !req.file.originalname.includes('.jpg') &&
-            !req.file.orginalname.includes('.jpeg')) {
-                throw new Error('extensão inválida');
-            }
+    if(req?.file?.originalname){
 
-    const media = {
-        originalname: req.file.originalname,
-        buffer: req.file.buffer
-    }
+        if(!req.file.originalname.includes('.png') &&
+            !req.file.originalname.includes('.jpg') && 
+            !req.file.originalname.includes('.jpeg')){
+                throw new Error('Extensao da imagem invalida');
+        }
 
-    if (req.url && req.url.includes('usuarios')){
-        return await bucketAvatar.addMedia({media: media});
+        const media_object = {
+            originalname: req.file.originalname,
+            buffer : req.file.buffer
+        };
+
+        if(req.url && req.url.includes('publicacao')){
+            return await bucketAvatar.addMedia({media : media_object});
+        }else{
+            return await bucketAvatar.addMedia({media : media_object});
+        }
     }
-    return await bucketAvatar.addMedia({media: media});
-  }
 }
 
-export {upload, uploadImage};
+export {uploadMulter, uploadImage};

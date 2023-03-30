@@ -1,17 +1,17 @@
-import type {NextApiResponse} from 'next';
+import type {NextApiRequest, NextApiResponse} from 'next';
 import type {respostaPadraoMsg} from '../../../types/respostaPadraoMsg';
 import type {cadastroRequisicao} from '../../../types/cadastroRequisicao';
 import {usuarioModel} from '../../../models/usuarioModel';
 import md5 from 'md5';
 import {conectarMongoDB} from '../../../middlewares/conectarMongoDB';
-import {uploadImage, upload} from '../../../services/uploadImagemCosmic';
+import {uploadImage, uploadMulter} from '../../../services/uploadImagemCosmic';
 import nc from 'next-connect';
 
 
 const handler = nc()
-    .use (upload.single('file'))
+    .use(uploadMulter.single('file'))
 
-    .post (async (req : any, res : NextApiResponse <respostaPadraoMsg>) =>{
+    .post (async (req : NextApiRequest, res : NextApiResponse <respostaPadraoMsg>) =>{
         try{
 
         const usuario = req.body as cadastroRequisicao;
@@ -44,14 +44,14 @@ const handler = nc()
              nome : usuario.nome,
              email : usuario.email,
              senha : md5(usuario.senha),
-             avatar: image.media.url
+             avatar: image?.media?.url
         }
             await usuarioModel.create(usuarioASerSalvo);
             return res.status(200).json({msg: 'Usuário criado com sucesso'});
             
         } catch (e: any){
             console.log(e);
-            return res.status(500).json({erro: 'Erro ao cadastrar o usuário'});
+            return res.status(400).json({erro : e.toString()});
         }
      });
 
