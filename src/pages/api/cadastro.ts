@@ -4,12 +4,12 @@ import type {cadastroRequisicao} from '../../../types/cadastroRequisicao';
 import {usuarioModel} from '../../../models/usuarioModel';
 import md5 from 'md5';
 import {conectarMongoDB} from '../../../middlewares/conectarMongoDB';
-import {updload,uploadImagemCosmic} from '../../../services/uploadImagemCosmic';
+import {upload,uploadImagemCosmic} from '../../../services/uploadImagemCosmic';
 import nc from 'next-connect';
 
 
 const handler = nc()
-    .use(updload.single('file'))
+    .use(upload.single('file'))
 
     .post (async (req : NextApiRequest, res : NextApiResponse <respostaPadraoMsg>) =>{
         try{
@@ -44,7 +44,7 @@ const handler = nc()
              nome : usuario.nome,
              email : usuario.email,
              senha : md5(usuario.senha),
-             avatar: image?.media?.url
+             avatar: image.media.url
         }
             await usuarioModel.create(usuarioASerSalvo);
             return res.status(200).json({msg: 'Usuário criado com sucesso'});
@@ -58,8 +58,8 @@ const handler = nc()
 
 export const config = {
     api: {
-        bodyParser: false,
-    },
+        bodyParser: false
+    }
 };
 
 export default conectarMongoDB (handler); 

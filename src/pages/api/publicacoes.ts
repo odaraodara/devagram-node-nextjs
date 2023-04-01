@@ -1,63 +1,65 @@
-import { upload, uploadImage } from "services/uploadImagemCosmic";
+import type { NextApiResponse} from 'next';
+import type { respostaPadraoMsg } from 'types/respostaPadraoMsg';
 import nc from 'next-connect';
-import { NextApiResponse } from "next";
-import { validarTokenJWT } from "middlewares/validarTokenJWT";
-import { conectarMongoDB } from "middlewares/conectarMongoDB";
-import { usuarioModel } from "models/usuarioModel";
-import { publicaoModel } from "models/publicacaoModel";
+import {upload,uploadImagemCosmic} from '../../../services/uploadImagemCosmic';
+import {conectarMongoDB} from '../../../middlewares/conectarMongoDB';
+import {validarTokenJWT} from '../../../middlewares/validarTokenJWT';
+import {publicaoModel} from '../../../models/publicacaoModel';
+import {usuarioModel} from '../../../models/usuarioModel';
 
-const endpointPublicacoes = nc()
-.use (upload.single('file'))
-.post (async (req: any, res:NextApiResponse)=>{
+
+const endpointPublicacao = nc()
+
+.use(upload.single('file'))
+.post (async (req: any, res:NextApiResponse<respostaPadraoMsg>) =>{
+
     try {
 
-        const {userId} = req.query;
-        const usuarioEncontrado = await usuarioModel.findById(userId);
+    const {userId} = req.query;
+    const usuario = await usuarioModel.findById(userId);
 
-        if(!usuarioEncontrado){
-            return res.status(404).json({erro: "usuário não encontrado"});
-        }
-
-        if(!req || !req.body){
-            return res.status(400).json({erro: "requisição inválida"});
-        }
-
-        const {descricao} = req.body;
-
-        if(!descricao || descricao === ""){
-            return res.status(400).json({erro: "descrição inválida"});
-        }
-
-        if(!req.file){
-            return res.status(400).json({erro: "Imagem inválida"});
-        }
-
-        const image = await uploadImage(req);
-
-        const publicacao = {
-            idUsuario: userId,
-            descricao: descricao,
-            foto: image.media.url
-        }
-        
-        usuarioEncontrado.publicacao++;
-
-        await usuarioModel.findByIdAndUpdate({_id: userId}, usuarioEncontrado);
-
-        await publicaoModel.create(publicacao);
-        return res.status(201).json({msg: "Publicação criada com sucesso!"});
-
-
-    } catch (error) {
-        return res.status(500).json({ erro: "Ocorreu um erro ao salvar a publicação"})        
+    if(!usuario){
+        return res.status(400).json({erro: 'Usuário não encontrado'});
     }
 
-});
 
-export const config = {
+    if(!req || !req.body){
+        return res.status(400).json({erro: 'Parâmetros de entrada não informados'});
+    }    
+
+    const {descricao} = req.body;
+
+    if(!descricao || descricao === " "){
+        return res.status(400).json({erro: 'Descrição não é válida'});
+    }
+    if(!req.file || !req.file.originalname){
+        return res.status(400).json({erro: 'a imagem é obrigatória'});
+    }
+
+    const image =await uploadImagemCosmic(req);
+    const publicacao = {
+        idUsuario : usuario._Id,
+        descricao,
+        foto : image.media.url,
+        data : new Date()
+    }
+
+    await publicaoModel.create(publicacao);
+
+    return res.status(200).json({msg: 'publicação criada com sucesso'});
+        
+    } catch (e) {
+        console.log(e);
+        return res.status(400).json({erro: 'Erro ao cadastrar publicação'})
+        
+    } 
+
+})
+
+export const config ={
     api: {
-        bodyParser: false,
-    },
+        bodyParser : false
+    }
 }
 
-export default validarTokenJWT(conectarMongoDB(endpointPublicacoes));
+export default validarTokenJWT (conectarMongoDB(endpointPublicacao));  
