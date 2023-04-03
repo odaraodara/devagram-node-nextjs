@@ -44,6 +44,9 @@ const endpointPublicacao = nc()
         data : new Date()
     }
 
+    usuario.publicacoes++
+    await usuarioModel.findByIdAndUpdate({_id: usuario._id}, usuario);
+
     await publicaoModel.create(publicacao);
 
     return res.status(200).json({msg: 'publicação criada com sucesso'});
