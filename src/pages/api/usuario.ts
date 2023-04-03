@@ -5,6 +5,7 @@ import { respostaPadraoMsg } from 'types/respostaPadraoMsg';
 import { usuarioModel } from 'models/usuarioModel';
 import nc from 'next-connect';
 import {upload,uploadImagemCosmic} from '../../../services/uploadImagemCosmic';
+import { politicaCORS } from 'middlewares/politicaCORS';
 
 const usuarioEndpoint = nc()
 
@@ -66,4 +67,4 @@ export const config = {
     }
 };
 
-export default validarTokenJWT(conectarMongoDB(usuarioEndpoint)); 
+export default politicaCORS (validarTokenJWT(conectarMongoDB(usuarioEndpoint))); 

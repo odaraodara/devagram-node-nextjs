@@ -6,12 +6,13 @@ import md5 from 'md5';
 import {conectarMongoDB} from '../../../middlewares/conectarMongoDB';
 import {upload,uploadImagemCosmic} from '../../../services/uploadImagemCosmic';
 import nc from 'next-connect';
+import { politicaCORS } from 'middlewares/politicaCORS';
 
 
 const handler = nc()
     .use(upload.single('file'))
 
-    .post (async (req : NextApiRequest, res : NextApiResponse <respostaPadraoMsg>) =>{
+    .post (async (req : any, res : NextApiResponse <respostaPadraoMsg>) =>{
         try{
 
         const usuario = req.body as cadastroRequisicao;
@@ -62,4 +63,4 @@ export const config = {
     }
 };
 
-export default conectarMongoDB (handler); 
+export default politicaCORS (conectarMongoDB (handler)); 
