@@ -1,4 +1,4 @@
-import type {NextApiRequest, NextApiResponse} from 'next';
+import type {NextApiResponse} from 'next';
 import type {respostaPadraoMsg} from '../../../types/respostaPadraoMsg';
 import type {cadastroRequisicao} from '../../../types/cadastroRequisicao';
 import {usuarioModel} from '../../../models/usuarioModel';
@@ -7,6 +7,7 @@ import {conectarMongoDB} from '../../../middlewares/conectarMongoDB';
 import {upload,uploadImagemCosmic} from '../../../services/uploadImagemCosmic';
 import nc from 'next-connect';
 import { politicaCORS } from 'middlewares/politicaCORS';
+
 
 
 const handler = nc()
